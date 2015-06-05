@@ -32,15 +32,15 @@ namespace :db do
   end
 end
 
-desc "Outputs the hex for a random payment"
+desc "Outputs the hex for a test tx"
 task :tx => :environment do
-  from = Stellar::KeyPair.from_raw_seed("allmylifemyhearthasbeensearching")
+  from = Stellar::KeyPair.from_seed("s3AnFq5uyGoHqTsSzV3Dpk2RM1tQmg9b9GEMgVGKzGc9Tu4Z1pT")
   to = Stellar::KeyPair.random
 
   tx = Stellar::Transaction.create_account({
     account:          from,
     destination:      to,
-    sequence:         1,
+    sequence:         12884901892,
     starting_balance: 200 * Stellar::ONE,
   })
 

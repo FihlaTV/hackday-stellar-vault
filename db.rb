@@ -125,7 +125,22 @@ class Transaction < Vault::Base
   end
 
   def operation_summary
-    # TODO
+    tx.operations.map do |op|
+      {}.tap do |summary|
+        sa_addy = source_account(op)
+        sa = Account.where(accountid: sa_addy).first
+
+        raise "couldn't find account: #{sa_addy}" if sa.blank?
+
+
+        summary[:type]    = op.body.switch
+        summary[:account] = sa_addy
+        summary[:needs]   = sa.threshold_for_op op
+        summary[:has]     = 0 #TODO
+
+
+      end
+    end
   end
 
 end
@@ -172,6 +187,25 @@ class Account < Core::Base
       signers.each do |s|
         result[s.address] = s.weight
       end
+    end
+  end
+
+  def threshold_for_op(op)
+    type = op.body.switch
+
+    case type
+    when Stellar::OperationType.allow_trust
+      thresholds[:low]
+    when Stellar::OperationType.set_options
+      soop = op.body.set_options_op!
+      level = :medium
+
+      level = :high if soop.signer.present?
+      level = :high if soop.thresholds.present?
+
+      thresholds[:level]
+    else
+      thresholds[:medium]
     end
   end
 end

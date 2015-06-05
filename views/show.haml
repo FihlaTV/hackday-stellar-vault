@@ -15,13 +15,12 @@
         %th Type
         %th Account
         %th Progress
-      - tx.operations.each_with_index do |op, i|
+      - tx.operation_summary.each_with_index do |op, i|
         %tr
           %td= i + 1
-          %td= op.body.switch.name.titleize
-          %td= tx.source_account(op)
-          %td 123
-
+          %td= op[:type].name.titleize
+          %td= op[:account]
+          %td= "#{op[:has]} of #{op[:needs]}"
 
 - if tx.result
   .alert.alert-success
