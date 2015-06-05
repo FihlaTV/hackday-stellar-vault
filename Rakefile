@@ -55,3 +55,16 @@ task :tx => :environment do
   puts
   puts hex
 end
+
+
+namespace :ledger do
+  desc "Runs the scc recipe to setup our test scenario, saving the generated sql to disk"
+  task :sql do
+    exec "bundle exec scc -r ./setup/recipe.rb > ./setup/core.sql"
+  end
+
+  desc "load the ledger sql"
+  task :load => :environment do
+    exec "psql #{ENV["STELLAR_CORE_DATABASE_URL"]} < ./setup/core.sql"
+  end
+end

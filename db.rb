@@ -137,6 +137,10 @@ end
 
 class Signer < Core::Base
   self.table_name = "signers"
+
+  def address
+    publickey
+  end
 end
 
 class Account < Core::Base
@@ -149,9 +153,9 @@ class Account < Core::Base
     hex = attributes['thresholds']
     raw = Stellar::Convert.from_hex hex
     {
-      low:    raw[1],
-      medium: raw[2],
-      high:   raw[3],
+      low:    raw[1].unpack("C").first,
+      medium: raw[2].unpack("C").first,
+      high:   raw[3].unpack("C").first,
     }
   end
 
@@ -164,6 +168,10 @@ class Account < Core::Base
   def key_weights
     {}.tap do |result|
       result[accountid] = master_weight
+
+      signers.each do |s|
+        result[s.address] = s.weight
+      end
     end
   end
 end

@@ -17,6 +17,7 @@ gem 'sass'
 gem 'activesupport'
 gem 'activerecord'
 gem 'stellar-base'
+# gem 'stellar-base', path: "../ruby-stellar-base"
 gem 'sqlite3'
 gem 'pg'
 gem 'rake'
@@ -33,4 +34,5 @@ group :development do
   gem 'binding_of_caller'
   gem 'rb-fsevent', :require => darwin_only('rb-fsevent')
 
+  gem 'stellar_core_commander', path: "../stellar_core_commander"
 end

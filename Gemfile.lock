@@ -1,3 +1,16 @@
+PATH
+  remote: ../stellar_core_commander
+  specs:
+    stellar_core_commander (0.0.9)
+      activesupport (>= 4.0.0)
+      contracts (~> 0.9)
+      faraday (~> 0.9.1)
+      faraday_middleware (~> 0.9.1)
+      pg (~> 0.18.1)
+      sequel (~> 4.21.0)
+      slop (~> 3.6.0)
+      stellar-base (= 0.0.11)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -27,6 +40,7 @@ GEM
     celluloid (0.16.0)
       timers (~> 4.0.0)
     coderay (1.1.0)
+    contracts (0.9)
     daemons (1.2.2)
     debug_inspector (0.0.2)
     dotenv (0.11.1)
@@ -35,6 +49,10 @@ GEM
     erubis (2.7.0)
     eventmachine (1.0.7)
     excon (0.44.4)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.9.1)
+      faraday (>= 0.7.4, < 0.10)
     ffi (1.9.8)
     haml (4.0.6)
       tilt
@@ -48,6 +66,7 @@ GEM
     memoist (0.11.0)
     method_source (0.8.2)
     minitest (5.7.0)
+    multipart-post (2.0.0)
     pg (0.18.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
@@ -67,6 +86,7 @@ GEM
     rerun (0.10.0)
       listen (~> 2.7, >= 2.7.3)
     sass (3.4.9)
+    sequel (4.21.0)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -115,4 +135,5 @@ DEPENDENCIES
   sinatra
   sqlite3
   stellar-base
+  stellar_core_commander!
   thin
