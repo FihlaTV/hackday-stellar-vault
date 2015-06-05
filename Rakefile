@@ -1,4 +1,10 @@
 
+
+desc "Setup the dev environment"
+task :install do
+  exec "bundle install"
+end
+
 desc "Start the dev server"
 task :dev do
   exec "bundle exec rerun 'rackup'"
