@@ -1,0 +1,21 @@
+.row
+  %label.col-sm-2.control-label(for="hex") Transaction
+  .col-sm-10
+    %pre= tx.tx_hex
+
+.row
+  %label.col-sm-2.control-label Operations
+  .col-sm-10
+    %table.table
+      %tr
+        %th Index
+        %th Type
+        %th Progress
+      %tr
+        %td 1
+        %td Payment
+        %td 123
+      %tr
+        %td 1
+        %td Payment
+        %td 123

@@ -28,6 +28,9 @@ GEM
     coderay (1.1.0)
     daemons (1.2.2)
     debug_inspector (0.0.2)
+    dotenv (0.11.1)
+      dotenv-deployment (~> 0.0.2)
+    dotenv-deployment (0.0.2)
     erubis (2.7.0)
     eventmachine (1.0.7)
     ffi (1.9.8)
@@ -42,6 +45,7 @@ GEM
       rb-inotify (>= 0.9)
     method_source (0.8.2)
     minitest (5.7.0)
+    pg (0.18.2)
     pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -93,7 +97,9 @@ DEPENDENCIES
   activesupport
   better_errors
   binding_of_caller
+  dotenv
   haml
+  pg
   pry
   rake
   rerun

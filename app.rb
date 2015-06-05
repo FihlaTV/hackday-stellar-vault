@@ -1,3 +1,6 @@
+require 'dotenv'
+Dotenv.load
+
 require 'sinatra/base'
 require 'active_support/all'
 require 'better_errors'
@@ -17,11 +20,17 @@ class App < Sinatra::Base
   end
 
   get "/client" do
-    haml :index, layout: :application
+    haml :new, layout: :application
   end
 
   get "/client/:hash" do
-    params['hash']
+    tx = Transaction.where(hash_hex:params[:hash]).first
+    raise "couldn't find tx" if tx.blank?
+
+    haml :show, layout: :application, locals:{
+      tx: tx
+    }
+
   end
 
 

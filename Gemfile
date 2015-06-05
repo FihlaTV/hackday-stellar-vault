@@ -7,7 +7,9 @@ gem 'activesupport'
 gem 'activerecord'
 gem 'stellar-base'
 gem 'sqlite3'
+gem 'pg'
 gem 'rake'
+gem 'dotenv'
 
 group :development do
   gem 'rerun'
