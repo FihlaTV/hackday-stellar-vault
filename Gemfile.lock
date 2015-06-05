@@ -102,6 +102,7 @@ DEPENDENCIES
   pg
   pry
   rake
+  rb-fsevent
   rerun
   sinatra
   sqlite3

@@ -7,6 +7,8 @@ end
 
 desc "Start the dev server"
 task :dev do
+  system "bundle exec rake db:migrate"
+  exit 1 unless $?.success?
   exec "bundle exec rerun 'rackup'"
 end
 
@@ -23,6 +25,7 @@ end
 namespace :db do
   desc "Migrate the database"
   task :migrate => :environment do
+    ActiveRecord::Base.establish_connection(ENV["DATABASE_URL"])
     ActiveRecord::Base.logger = Logger.new(STDOUT)
     ActiveRecord::Migration.verbose = true
     ActiveRecord::Migrator.migrate("db/migrate")

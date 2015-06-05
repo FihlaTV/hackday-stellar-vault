@@ -4,7 +4,9 @@
     %pre= tx.tx_hex
 
 .row
-  %label.col-sm-2.control-label Operations
+  .col-sm-2
+    %label.control-label Operations
+    %small (this is stubbed)
   .col-sm-10
     %table.table
       %tr
@@ -19,3 +21,19 @@
         %td 1
         %td Payment
         %td 123
+
+.row
+  .col-sm-2
+    %label.control-label Signatures
+  .col-sm-10
+    %table.table
+      %tr
+        %th Address
+        %th Signature
+        %th Progress
+      %tr
+        %td(colspan="3") Signatures go here
+      %tfoot
+        %tr
+          %td(colspan="3")
+            Form goes here
