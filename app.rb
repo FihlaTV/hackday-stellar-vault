@@ -5,6 +5,7 @@ require 'sinatra/base'
 require 'active_support/all'
 require 'better_errors'
 require 'stellar-base'
+require 'memoist'
 
 require_relative "./db"
 
@@ -13,6 +14,8 @@ class App < Sinatra::Base
     use BetterErrors::Middleware
     BetterErrors.application_root = __dir__
   end
+
+  configure{ set :method_override, true }
 
   # UI Routes
   get "/" do
@@ -49,4 +52,11 @@ class App < Sinatra::Base
     redirect "/client/#{txm.hash_hex}"
   end
 
+  patch '/transactions/:hash' do
+    tx = Transaction.where(hash_hex:params[:hash]).first
+    raise "couldn't find tx" if tx.blank?
+
+    # TODO: add any provided signatures
+    # TODO: add any provided verifications
+  end
 end

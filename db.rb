@@ -18,9 +18,28 @@ module Core
   end
 end
 
-
-
 class Transaction < Vault::Base
-  validates :hash_hex, presence: true
+  extend Memoist
+
+  validates :hash_hex, presence: true, uniqueness: true
   validates :tx_hex, presence: true
+
+  # serialized array of hex-encoded signatures
+  serialize :signatures, Array
+
+  memoize def tx
+    raw = Stellar::Convert.from_hex(tx_hex)
+    Stellar::Transaction.from_xdr raw
+  end
+
+  def operations
+    tx.operations
+  end
+
+  def source_account(op)
+    account = op.source_account
+    account ||= tx.source_account
+
+    Stellar::Convert.pk_to_address(account)
+  end
 end

@@ -43,6 +43,7 @@ GEM
       celluloid (~> 0.16.0)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
+    memoist (0.11.0)
     method_source (0.8.2)
     minitest (5.7.0)
     pg (0.18.2)
@@ -63,6 +64,7 @@ GEM
       rbnacl (~> 3.0, >= 3.0.1)
     rerun (0.10.0)
       listen (~> 2.7, >= 2.7.3)
+    sass (3.4.9)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -99,11 +101,13 @@ DEPENDENCIES
   binding_of_caller
   dotenv
   haml
+  memoist
   pg
   pry
   rake
   rb-fsevent
   rerun
+  sass
   sinatra
   sqlite3
   stellar-base

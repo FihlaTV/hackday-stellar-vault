@@ -1,39 +1,49 @@
 .row
-  %label.col-sm-2.control-label(for="hex") Transaction
+  %label.col-sm-2.control-label.row-label Transaction
   .col-sm-10
     %pre= tx.tx_hex
 
 .row
-  .col-sm-2
-    %label.control-label Operations
-    %small (this is stubbed)
+  %label.col-sm-2.control-label.row-label Operations
   .col-sm-10
     %table.table
       %tr
         %th Index
         %th Type
+        %th Account
         %th Progress
-      %tr
-        %td 1
-        %td Payment
-        %td 123
-      %tr
-        %td 1
-        %td Payment
-        %td 123
+      - tx.operations.each_with_index do |op, i|
+        %tr
+          %td= i + 1
+          %td= op.body.switch.name.titleize
+          %td= tx.source_account(op)
+          %td 123
 
 .row
-  .col-sm-2
-    %label.control-label Signatures
+  %label.col-sm-2.control-label.row-label Signatures
   .col-sm-10
     %table.table
       %tr
-        %th Address
+        %th Account
         %th Signature
         %th Progress
       %tr
         %td(colspan="3") Signatures go here
-      %tfoot
-        %tr
-          %td(colspan="3")
-            Form goes here
+
+%form.form-horizontal(action="/transactions/#{tx.hash_hex}" method="post")
+  %input(type="hidden" name="_method" value="patch")
+  .form-group
+    %label.col-sm-2.control-label(for="sig") Add Signature
+    .col-sm-10
+      %input.form-control(name="sig" type="text" placeholder="Paste hex here")
+
+  .form-group
+    .col-sm-offset-2.col-sm-10
+      %button.btn.btn-primary(type="submit") Add
+
+
+%form.form-horizontal(action="/transactions/#{tx.hash_hex}/finish" method="post")
+  .form-group
+    %label.col-sm-2.control-label(for="sig") Finish
+    .col-sm-10
+      %button.btn.btn-primary(type="submit") Submit Transaction

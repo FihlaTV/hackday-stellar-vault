@@ -13,6 +13,7 @@ end
 gem 'sinatra'
 gem 'thin'
 gem 'haml'
+gem 'sass'
 gem 'activesupport'
 gem 'activerecord'
 gem 'stellar-base'
@@ -20,6 +21,7 @@ gem 'sqlite3'
 gem 'pg'
 gem 'rake'
 gem 'dotenv'
+gem 'memoist'
 
 group :development do
   gem 'rerun'
