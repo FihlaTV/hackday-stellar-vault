@@ -73,6 +73,17 @@ class App < Sinatra::Base
 
     # TODO: add any provided verifications
 
+    if txm.done?
+      result = txm.submit!
+
+      if result.present?
+        # we errored
+        redirect "/client/#{txm.hash_hex}?result=#{result}"
+      end
+
+      txm.wait_for_consensus
+    end
+
     redirect "/client/#{txm.hash_hex}"
   end
 
