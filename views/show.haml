@@ -26,16 +26,17 @@
       %tr
         %th Account
         %th Signature
-        %th Progress
-      %tr
-        %td(colspan="3") Signatures go here
+      - tx.decoded_signatures.each do |ds|
+        %tr
+          %td= tx.address_from_hint ds.hint
+          %td= truncate(Stellar::Convert.to_hex ds.signature)
 
 %form.form-horizontal(action="/transactions/#{tx.hash_hex}" method="post")
   %input(type="hidden" name="_method" value="patch")
   .form-group
-    %label.col-sm-2.control-label(for="sig") Add Signature
+    %label.col-sm-2.control-label(for="seed") Add Signature
     .col-sm-10
-      %input.form-control(name="sig" type="text" placeholder="Paste hex here")
+      %input.form-control(name="seed" type="text" placeholder="Paste seed here")
 
   .form-group
     .col-sm-offset-2.col-sm-10

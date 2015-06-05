@@ -42,4 +42,35 @@ class Transaction < Vault::Base
 
     Stellar::Convert.pk_to_address(account)
   end
+
+  def add_signature!(seed)
+    signer = Stellar::KeyPair.from_seed(seed)
+    dsig   = tx.sign_decorated(signer)
+
+    self.signatures << dsig.to_xdr(:hex)
+    save!
+  end
+
+  def address_from_hint(hint)
+    possibles = [tx.source_account]
+    possibles += tx.operations.map(&:source_account).compact
+
+    found = possibles.find{|pk| pk[0...4] == hint }
+
+    Stellar::Convert.pk_to_address(found)
+  end
+
+  def envelope_hex
+    txe            = Stellar::TransactionEnvelope.new
+    txe.tx         = self.tx
+    txe.signatures = decoded_signatures
+
+    txe.to_xdr(:hex)
+  end
+
+  memoize def decoded_signatures
+    signatures.map do |sig_hex|
+      Stellar::DecoratedSignature.from_xdr(Stellar::Convert.from_hex(sig_hex))
+    end
+  end
 end

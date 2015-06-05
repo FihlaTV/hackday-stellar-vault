@@ -53,10 +53,25 @@ class App < Sinatra::Base
   end
 
   patch '/transactions/:hash' do
-    tx = Transaction.where(hash_hex:params[:hash]).first
-    raise "couldn't find tx" if tx.blank?
+    txm = Transaction.where(hash_hex:params[:hash]).first
+    raise "couldn't find tx" if txm.blank?
 
-    # TODO: add any provided signatures
+    if params[:seed].present?
+      txm.add_signature!(params[:seed])
+    end
+
     # TODO: add any provided verifications
+
+    redirect "/client/#{txm.hash_hex}"
+  end
+
+
+  # helpers
+  helpers do
+    def truncate(input, max=30)
+      return input if input.length <= max
+
+      input[0...max] + "..."
+    end
   end
 end
