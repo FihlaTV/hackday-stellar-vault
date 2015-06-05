@@ -91,7 +91,22 @@ class Transaction < Vault::Base
   end
 
   def result
-    TransactionHistory.where(txid:hash_hex).first
+    row = TransactionHistory.where(txid:hash_hex).first
+    return if row.blank?
+
+    raw  = Stellar::Convert.from_base64 row.txresult
+    pair = Stellar::TransactionResultPair.from_xdr(raw)
+    pair.result
+  end
+
+  def result_summary
+    r = result
+
+    return {status: :success} if r.result.switch == Stellar::TransactionResultCode.tx_success
+
+    result = {status: :failed}
+    result[:operations] = r.result.results!.map{|opr| opr.tr!.value.code.name}
+    result
   end
 
   def wait_for_consensus

@@ -15,6 +15,7 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
+    awesome_print (1.6.1)
     backports (3.6.4)
     better_errors (2.1.1)
       coderay (>= 1.0.0)
@@ -98,6 +99,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   activesupport
+  awesome_print
   better_errors
   binding_of_caller
   dotenv

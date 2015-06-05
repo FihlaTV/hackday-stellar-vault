@@ -21,7 +21,7 @@ Run `rake pry`
 ## Milestones
 
 - [x]  Can submit transactions sans signatures: they get saved to db
-- [ ]  Can add signatures, can manually trigger submission
+- [x]  Can add signatures, can manually trigger submission
 - [ ]  Can detect when a transaction has enough signatures, automatically submit when it does
 - [ ]  Can add keys, which get encrypted. signatures are automatically applied without challenge
 - [ ]  Add email-based challenges to keys

@@ -22,32 +22,36 @@
           %td= tx.source_account(op)
           %td 123
 
-.row
-  %label.col-sm-2.control-label.row-label Signatures
-  .col-sm-10
-    %table.table
-      %tr
-        %th Account
-        %th Signature
-      - tx.decoded_signatures.each do |ds|
+
+- if tx.result
+  .alert.alert-success
+    %pre=tx.result_summary.ai
+- else
+  .row
+    %label.col-sm-2.control-label.row-label Signatures
+    .col-sm-10
+      %table.table
         %tr
-          %td= tx.address_from_hint ds.hint
-          %td= truncate(Stellar::Convert.to_hex ds.signature)
+          %th Account
+          %th Signature
+        - tx.decoded_signatures.each do |ds|
+          %tr
+            %td= tx.address_from_hint ds.hint
+            %td= truncate(Stellar::Convert.to_hex ds.signature)
 
-%form.form-horizontal(action="/transactions/#{tx.hash_hex}" method="post")
-  %input(type="hidden" name="_method" value="patch")
-  .form-group
-    %label.col-sm-2.control-label(for="seed") Add Signature
-    .col-sm-10
-      %input.form-control(name="seed" type="text" placeholder="Paste seed here")
+  %form.form-horizontal(action="/transactions/#{tx.hash_hex}" method="post")
+    %input(type="hidden" name="_method" value="patch")
+    .form-group
+      %label.col-sm-2.control-label(for="seed") Add Signature
+      .col-sm-10
+        %input.form-control(name="seed" type="text" placeholder="Paste seed here")
 
-  .form-group
-    .col-sm-offset-2.col-sm-10
-      %button.btn.btn-primary(type="submit") Add
+    .form-group
+      .col-sm-offset-2.col-sm-10
+        %button.btn.btn-primary(type="submit") Add
 
-
-%form.form-horizontal(action="/transactions/#{tx.hash_hex}/submit" method="post")
-  .form-group
-    %label.col-sm-2.control-label(for="sig") Finish
-    .col-sm-10
-      %button.btn.btn-primary(type="submit") Submit Transaction
+  %form.form-horizontal(action="/transactions/#{tx.hash_hex}/submit" method="post")
+    .form-group
+      %label.col-sm-2.control-label(for="sig") Finish
+      .col-sm-10
+        %button.btn.btn-primary(type="submit") Submit Transaction

@@ -23,6 +23,7 @@ gem 'rake'
 gem 'dotenv'
 gem 'memoist'
 gem 'excon'
+gem 'awesome_print'
 
 group :development do
   gem 'rerun'

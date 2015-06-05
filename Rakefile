@@ -34,14 +34,14 @@ end
 
 desc "Outputs the hex for a random payment"
 task :tx => :environment do
-  from = Stellar::KeyPair.random
+  from = Stellar::KeyPair.from_raw_seed("allmylifemyhearthasbeensearching")
   to = Stellar::KeyPair.random
 
-  tx = Stellar::Transaction.payment({
-    account:     from,
-    destination: to,
-    sequence:    1,
-    amount:      [:native, 200 * Stellar::ONE],
+  tx = Stellar::Transaction.create_account({
+    account:          from,
+    destination:      to,
+    sequence:         1,
+    starting_balance: 200 * Stellar::ONE,
   })
 
   raw = tx.to_xdr

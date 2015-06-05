@@ -6,6 +6,9 @@ require 'active_support/all'
 require 'better_errors'
 require 'stellar-base'
 require 'memoist'
+require 'awesome_print'
+
+AwesomePrint.defaults = {plain: true}
 
 require_relative "./db"
 require_relative "./core"
