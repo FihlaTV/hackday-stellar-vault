@@ -123,8 +123,47 @@ class Transaction < Vault::Base
       Stellar::DecoratedSignature.from_xdr(Stellar::Convert.from_hex(sig_hex))
     end
   end
+
+  def operation_summary
+    # TODO
+  end
+
 end
 
 class TransactionHistory < Core::Base
   self.table_name = "txhistory"
+end
+
+
+class Signer < Core::Base
+  self.table_name = "signers"
+end
+
+class Account < Core::Base
+  self.table_name = "accounts"
+  self.primary_key = "accountid"
+
+  has_many :signers, foreign_key: 'accountid'
+
+  def thresholds
+    hex = attributes['thresholds']
+    raw = Stellar::Convert.from_hex hex
+    {
+      low:    raw[1],
+      medium: raw[2],
+      high:   raw[3],
+    }
+  end
+
+  def master_weight
+    hex = attributes['thresholds']
+    raw = Stellar::Convert.from_hex hex
+    raw[0].unpack("C").first
+  end
+
+  def key_weights
+    {}.tap do |result|
+      result[accountid] = master_weight
+    end
+  end
 end
