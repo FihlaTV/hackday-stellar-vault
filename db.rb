@@ -55,9 +55,20 @@ class Transaction < Vault::Base
     possibles = [tx.source_account]
     possibles += tx.operations.map(&:source_account).compact
 
-    found = possibles.find{|pk| pk[0...4] == hint }
+    possible_signers.find do |possible|
+      kp = Stellar::KeyPair.from_address(possible)
+      kp.public_key_hint == hint
+    end
+  end
 
-    Stellar::Convert.pk_to_address(found)
+  def possible_signers
+    possible_accounts = [Stellar::Convert.pk_to_address(tx.source_account)]
+    possible_accounts += tx.operations.map(&:source_account).compact
+
+    possible_accounts.
+      map{|a| Account.key_addresses(a)}.
+      flatten.
+      uniq
   end
 
   def envelope_hex
@@ -163,6 +174,13 @@ class Account < Core::Base
   self.primary_key = "accountid"
 
   has_many :signers, foreign_key: 'accountid'
+
+  def self.key_addresses(addy)
+    sa = Account.where(accountid: addy).first
+    raise "couldn't find account: #{addy}" if sa.blank?
+
+    sa.signers.map(&:publickey) + [sa.accountid]
+  end
 
   def thresholds
     hex = attributes['thresholds']
