@@ -48,6 +48,7 @@ class Transaction < Vault::Base
     dsig   = tx.sign_decorated(signer)
 
     self.signatures << dsig.to_xdr(:hex)
+    self.signatures.uniq!
     save!
   end
 
@@ -135,6 +136,14 @@ class Transaction < Vault::Base
     end
   end
 
+  def done?
+    operation_summary.each do |os|
+      return false if os[:has] < os[:needs]
+    end
+
+    return true
+  end
+
   def operation_summary
     tx.operations.map do |op|
       {}.tap do |summary|
@@ -147,7 +156,7 @@ class Transaction < Vault::Base
         summary[:type]    = op.body.switch
         summary[:account] = sa_addy
         summary[:needs]   = sa.threshold_for_op op
-        summary[:has]     = 0 #TODO
+        summary[:has]     = decoded_signatures.map{|da| sa.weight_for_sig(da)}.sum
 
 
       end
@@ -179,7 +188,18 @@ class Account < Core::Base
     sa = Account.where(accountid: addy).first
     raise "couldn't find account: #{addy}" if sa.blank?
 
-    sa.signers.map(&:publickey) + [sa.accountid]
+    sa.signer_addresses
+  end
+
+  def signer_addresses
+    signers.map(&:publickey) + [accountid]
+  end
+
+  def address_from_hint(hint)
+    signer_addresses.find do |possible|
+      kp = Stellar::KeyPair.from_address(possible)
+      kp.public_key_hint == hint
+    end
   end
 
   def thresholds
@@ -225,5 +245,10 @@ class Account < Core::Base
     else
       thresholds[:medium]
     end
+  end
+
+  def weight_for_sig(da)
+    address = address_from_hint(da.hint)
+    key_weights.fetch(address, 0)
   end
 end
