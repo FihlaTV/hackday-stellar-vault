@@ -8,6 +8,7 @@ require 'stellar-base'
 require 'memoist'
 
 require_relative "./db"
+require_relative "./core"
 
 class App < Sinatra::Base
   configure :development do
@@ -30,8 +31,15 @@ class App < Sinatra::Base
     tx = Transaction.where(hash_hex:params[:hash]).first
     raise "couldn't find tx" if tx.blank?
 
+    submit_result =
+      if params[:result].present?
+        rhex = Stellar::Convert.from_hex(params[:result])
+        Stellar::TransactionResult.from_xdr rhex
+      end
+
     haml :show, layout: :application, locals:{
-      tx: tx
+      tx: tx,
+      submit_result: submit_result,
     }
 
   end
@@ -65,6 +73,22 @@ class App < Sinatra::Base
     redirect "/client/#{txm.hash_hex}"
   end
 
+  post '/transactions/:hash/submit' do
+    txm = Transaction.where(hash_hex:params[:hash]).first
+    raise "couldn't find tx" if txm.blank?
+
+    result = txm.submit!
+
+    if result.present?
+      # we errored
+      redirect "/client/#{txm.hash_hex}?result=#{result}"
+    end
+
+    txm.wait_for_consensus
+
+    redirect "/client/#{txm.hash_hex}"
+  end
+
 
   # helpers
   helpers do
@@ -72,6 +96,10 @@ class App < Sinatra::Base
       return input if input.length <= max
 
       input[0...max] + "..."
+    end
+
+    def h(text)
+      Rack::Utils.escape_html(text)
     end
   end
 end

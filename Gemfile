@@ -22,6 +22,7 @@ gem 'pg'
 gem 'rake'
 gem 'dotenv'
 gem 'memoist'
+gem 'excon'
 
 group :development do
   gem 'rerun'

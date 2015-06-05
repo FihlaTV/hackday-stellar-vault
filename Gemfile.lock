@@ -33,6 +33,7 @@ GEM
     dotenv-deployment (0.0.2)
     erubis (2.7.0)
     eventmachine (1.0.7)
+    excon (0.44.4)
     ffi (1.9.8)
     haml (4.0.6)
       tilt
@@ -100,6 +101,7 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   dotenv
+  excon
   haml
   memoist
   pg

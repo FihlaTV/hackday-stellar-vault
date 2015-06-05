@@ -32,8 +32,6 @@ namespace :db do
   end
 end
 
-
-
 desc "Outputs the hex for a random payment"
 task :tx => :environment do
   from = Stellar::KeyPair.random
@@ -48,5 +46,12 @@ task :tx => :environment do
 
   raw = tx.to_xdr
   hex = Stellar::Convert.to_hex raw
+
+  puts "Signer"
+  puts "\tseed: #{from.seed}"
+  puts "\taddy: #{from.address}"
+
+  puts "TX Hex:"
+  puts
   puts hex
 end

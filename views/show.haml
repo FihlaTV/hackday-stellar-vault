@@ -1,3 +1,6 @@
+- if submit_result
+  .alert.alert-danger= h submit_result.inspect
+
 .row
   %label.col-sm-2.control-label.row-label Transaction
   .col-sm-10
@@ -43,7 +46,7 @@
       %button.btn.btn-primary(type="submit") Add
 
 
-%form.form-horizontal(action="/transactions/#{tx.hash_hex}/finish" method="post")
+%form.form-horizontal(action="/transactions/#{tx.hash_hex}/submit" method="post")
   .form-group
     %label.col-sm-2.control-label(for="sig") Finish
     .col-sm-10

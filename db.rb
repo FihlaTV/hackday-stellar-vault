@@ -68,9 +68,48 @@ class Transaction < Vault::Base
     txe.to_xdr(:hex)
   end
 
+  def hash_hex
+    Stellar::Convert.to_hex tx.hash
+  end
+
+  def submit!
+    raw_resp = Core::Web.get(path:"/tx", query:{blob: envelope_hex})
+    json_resp = ActiveSupport::JSON.decode(raw_resp.body)
+
+    if json_resp["exception"].present?
+      raise json_resp["exception"]
+    end
+
+    case json_resp["status"]
+    when "PENDING", "DUPLICATE"
+      return
+    when "ERROR"
+      return json_resp["error"]
+    else
+      raise "Unknown status: #{json_resp["status"]}"
+    end
+  end
+
+  def result
+    TransactionHistory.where(txid:hash_hex).first
+  end
+
+  def wait_for_consensus
+    Timeout.timeout(30.seconds) do
+      loop do
+        break if result.present?
+        sleep 1.0
+      end
+    end
+  end
+
   memoize def decoded_signatures
     signatures.map do |sig_hex|
       Stellar::DecoratedSignature.from_xdr(Stellar::Convert.from_hex(sig_hex))
     end
   end
+end
+
+class TransactionHistory < Core::Base
+  self.table_name = "txhistory"
 end
