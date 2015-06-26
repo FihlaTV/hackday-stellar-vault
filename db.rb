@@ -259,9 +259,23 @@ end
 # Vault will search it's database for needed keys when a transaction is submitted
 class Key < Vault::Base
   extend Memoist
-
   validates :address, presence: true
   validates :seed, presence: true
 
   serialize :validator
+
+  before_validation :populate
+
+  def populate
+    return if keypair.blank?
+    self.address = keypair.address
+  end
+
+  memoize def keypair
+    return nil if seed.blank?
+    Stellar::KeyPair.from_seed seed
+  rescue ArgumentError
+    errors.add(:seed, "is not valid")
+    return nil
+  end
 end
