@@ -1,3 +1,6 @@
 
+- if flash[:qr].present?
+  %img(src="#{flash[:qr]}")
+
 %a.btn.btn-default(href="/client/keys/new") Create New Key
 %a.btn.btn-default(href="/client/transactions/new") Create New Transaction

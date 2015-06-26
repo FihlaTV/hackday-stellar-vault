@@ -17,6 +17,8 @@ require 'stellar-base'
 require 'memoist'
 require 'awesome_print'
 require 'rack-flash'
+require 'rotp'
+require 'google-qr'
 
 require_relative "./db"
 require_relative "./core"
@@ -106,13 +108,20 @@ class App < Sinatra::Base
 
     if params[:seed].present?
       txm.add_signature!(params[:seed])
+      flash[:success] = "Signatures successfully added"
     end
 
-    # TODO: add any provided verifications
+    if params[:code].present? && params[:address].present?
+      txm.verify_code! params[:address], params[:code]
+      flash[:success] = "Signatures successfully added"
+    end
 
     code, error = txm.submit_if_possible
     case code
-    when :not_done, :submitted
+    when :not_done
+      redirect "/client/transactions/#{txm.hash_hex}"
+    when :submitted
+      flash[:success] = "Transaction submitted!"
       redirect "/client/transactions/#{txm.hash_hex}"
     when :error
       redirect "/client/transactions/#{txm.hash_hex}?result=#{error}"
@@ -143,6 +152,7 @@ class App < Sinatra::Base
 
     if @key.save
       flash[:success] = "Key added!"
+      flash[:qr] = @key.qr
       redirect "/client"
     else
       flash.now[:danger] = @key.errors.full_messages.join("<br>\n")

@@ -64,6 +64,12 @@ class Transaction < Vault::Base
     save!
   end
 
+  def verify_code!(address, code)
+    key = Key.where(address:address).first
+    key.verify_code!(code)
+    add_signature! key.seed
+  end
+
   def address_from_hint(hint)
     possibles = [tx.source_account]
     possibles += tx.operations.map(&:source_account).compact
@@ -72,6 +78,19 @@ class Transaction < Vault::Base
       kp = Stellar::KeyPair.from_address(possible)
       kp.public_key_hint == hint
     end
+  end
+
+  def available_keys
+    Key.where(address: available_signers)
+  end
+
+  def available_signers
+    possible_signers - signers
+  end
+
+  ## any addresses that have already contributed a signature
+  def signers
+    decoded_signatures.map{|ds| address_from_hint ds.hint}
   end
 
   def possible_signers
@@ -293,11 +312,31 @@ class Key < Vault::Base
   def populate
     return if keypair.blank?
     self.address = keypair.address
+    self.validator = {:totp_key => ROTP::Base32.random_base32}
+  end
+
+  def otpauth
+    "otpauth://totp/hackdayvault?secret=#{validator[:totp_key]}"
+  end
+
+  def qr
+    otpauth.to_qr(:size => "200x200")
   end
 
   def needs_verification?
-    #TODO
-    false
+    validator[:totp_key].present?
+  end
+
+  def totp
+    ROTP::TOTP.new(validator[:totp_key])
+  end
+
+  def current_code
+    totp.now
+  end
+
+  def verify_code!(code)
+    totp.verify code
   end
 
   memoize def keypair

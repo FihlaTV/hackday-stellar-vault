@@ -38,6 +38,24 @@
             %td= tx.address_from_hint ds.hint
             %td= truncate(Stellar::Convert.to_hex ds.signature)
 
+  .row
+    %label.col-sm-2.control-label.row-label Available Keys
+    .col-sm-10
+      %table.table
+        %tr
+          %th Address
+          %th SMS Code
+        - tx.available_keys.each do |key|
+          %tr
+            %td= key.address
+            %td
+              %form.form-inline(action="/transactions/#{tx.hash_hex}" method="post")
+                %input(type="hidden" name="_method" value="patch")
+                %input(type="hidden" name="address" value="#{key.address}")
+                .form-group
+                  %input.form-control(name="code" type="text" placeholder="Paste code here")
+                %button.btn.btn-default(type="submit") Submit
+
   %form.form-horizontal(action="/transactions/#{tx.hash_hex}" method="post")
     %input(type="hidden" name="_method" value="patch")
     .form-group
@@ -48,9 +66,3 @@
     .form-group
       .col-sm-offset-2.col-sm-10
         %button.btn.btn-primary(type="submit") Add
-
--#  %form.form-horizontal(action="/transactions/#{tx.hash_hex}/submit" method="post")
-    .form-group
-      %label.col-sm-2.control-label(for="sig") Finish
-      .col-sm-10
-        %button.btn.btn-primary(type="submit") Submit Transaction

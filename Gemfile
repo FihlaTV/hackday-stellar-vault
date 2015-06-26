@@ -26,6 +26,8 @@ gem 'memoist'
 gem 'excon'
 gem 'awesome_print'
 gem 'rack-flash3'
+gem 'rotp'
+gem 'google-qr'
 
 group :development do
   gem 'rerun'
