@@ -1,6 +1,15 @@
 require 'dotenv'
 Dotenv.load
 
+# TODO: remove this when we are encyrpting keys before saving them to the DB
+if ENV["ALLOW_INSECURE_KEYS"] != "true"
+  puts "ALLOW_INSECURE_KEYS environment variable must be set to 'true'"
+  puts "This server does not yet have the ability to encrypt stored keys, and " +
+       "you are acknowledging that breakage by setting ALLOW_INSECURE_KEYS"
+
+  exit 1
+end
+
 require 'sinatra/base'
 require 'active_support/all'
 require 'better_errors'
