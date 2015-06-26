@@ -18,8 +18,6 @@ require 'memoist'
 require 'awesome_print'
 require 'rack-flash'
 
-AwesomePrint.defaults = {plain: true}
-
 require_relative "./db"
 require_relative "./core"
 
@@ -74,14 +72,32 @@ class App < Sinatra::Base
   post '/transactions' do
     hex = params['hex']
     raw = Stellar::Convert.from_hex(hex)
-    tx = Stellar::Transaction.from_xdr raw
+
+    begin
+      tx = Stellar::Transaction.from_xdr raw
+    rescue EOFError
+      flash[:danger] = "Could not parse provided data as a TransactionEnvelope"
+      redirect "/client/transactions/new?hex=#{hex}"
+      return
+    end
 
     txm = Transaction.create!({
       hash_hex: Stellar::Convert.to_hex(tx.hash),
       tx_hex: hex,
     })
 
-    redirect "/client/transactions/#{txm.hash_hex}"
+    txm.add_any_available_signatures!
+
+    code, error = txm.submit_if_possible
+    case code
+    when :not_done, :submitted
+      redirect "/client/transactions/#{txm.hash_hex}"
+    when :error
+      redirect "/client/transactions/#{txm.hash_hex}?result=#{error}"
+    else
+      raise "Unknown submit code: #{code}"
+    end
+
   end
 
   patch '/transactions/:hash' do
@@ -94,29 +110,26 @@ class App < Sinatra::Base
 
     # TODO: add any provided verifications
 
-    if txm.done?
-      result = txm.submit!
-
-      if result.present?
-        # we errored
-        redirect "/client/transactions/#{txm.hash_hex}?result=#{result}"
-      end
-
-      txm.wait_for_consensus
+    code, error = txm.submit_if_possible
+    case code
+    when :not_done, :submitted
+      redirect "/client/transactions/#{txm.hash_hex}"
+    when :error
+      redirect "/client/transactions/#{txm.hash_hex}?result=#{error}"
+    else
+      raise "Unknown submit code: #{code}"
     end
-
-    redirect "/client/transactions/#{txm.hash_hex}"
   end
 
   post '/transactions/:hash/submit' do
     txm = Transaction.where(hash_hex:params[:hash]).first
     raise "couldn't find tx" if txm.blank?
 
-    result = txm.submit!
+    error = txm.submit!
 
-    if result.present?
+    if error.present?
       # we errored
-      redirect "/client/transactions/#{txm.hash_hex}?result=#{result}"
+      redirect "/client/transactions/#{txm.hash_hex}?result=#{error}"
     end
 
     txm.wait_for_consensus

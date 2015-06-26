@@ -59,8 +59,8 @@ end
 
 namespace :ledger do
   desc "Runs the scc recipe to setup our test scenario, saving the generated sql to disk"
-  task :sql do
-    exec "bundle exec scc -r ./setup/recipe.rb > ./setup/core.sql"
+  task :sql => :environment do
+    exec "bundle exec scc -r ./setup/recipe.rb --wait"
   end
 
   desc "load the ledger sql"

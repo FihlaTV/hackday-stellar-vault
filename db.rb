@@ -43,6 +43,18 @@ class Transaction < Vault::Base
     Stellar::Convert.pk_to_address(account)
   end
 
+  def add_any_available_signatures!
+    protected_keys, unprotected_keys = Key.
+      where(address:possible_signers).
+      partition(&:needs_verification?)
+
+    # TODO: issue challenges for any keys that need them
+
+    unprotected_keys.each do |key|
+      add_signature! key.seed
+    end
+  end
+
   def add_signature!(seed)
     signer = Stellar::KeyPair.from_seed(seed)
     dsig   = tx.sign_decorated(signer)
@@ -100,6 +112,18 @@ class Transaction < Vault::Base
     else
       raise "Unknown status: #{json_resp["status"]}"
     end
+  end
+
+  def submit_if_possible
+    return [:not_done, nil] unless done?
+
+    error = submit!
+
+    # we errored
+    return [:error, error] if error.present?
+
+    wait_for_consensus
+    return [:submitted, nil]
   end
 
   def result
@@ -269,6 +293,11 @@ class Key < Vault::Base
   def populate
     return if keypair.blank?
     self.address = keypair.address
+  end
+
+  def needs_verification?
+    #TODO
+    false
   end
 
   memoize def keypair

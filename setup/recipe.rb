@@ -1,7 +1,6 @@
-use_manual_close
+process :node0, [:node0], 1, database: ENV["STELLAR_CORE_DATABASE_URL"], keep_database: true
 
 account :scott, Stellar::KeyPair.from_seed("s3AnFq5uyGoHqTsSzV3Dpk2RM1tQmg9b9GEMgVGKzGc9Tu4Z1pT")
-
 create_account :scott
 
 close_ledger

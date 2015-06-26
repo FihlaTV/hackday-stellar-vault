@@ -1,5 +1,5 @@
 - if submit_result
-  .alert.alert-danger= h submit_result.inspect
+  .alert.alert-danger=h submit_result.ai
 
 .row
   %label.col-sm-2.control-label.row-label Transaction
@@ -24,7 +24,7 @@
 
 - if tx.result
   .alert.alert-success
-    %pre=tx.result_summary.ai
+    %pre!= ap tx.result_summary
 - else
   .row
     %label.col-sm-2.control-label.row-label Signatures
