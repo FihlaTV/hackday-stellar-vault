@@ -252,3 +252,16 @@ class Account < Core::Base
     key_weights.fetch(address, 0)
   end
 end
+
+#
+# Key is a key stored on behalf of someone elses account
+#
+# Vault will search it's database for needed keys when a transaction is submitted
+class Key < Vault::Base
+  extend Memoist
+
+  validates :address, presence: true
+  validates :seed, presence: true
+
+  serialize :validator
+end

@@ -1,0 +1,10 @@
+%form.form-horizontal(action="/keys" method="post")
+  .form-group
+    %label.col-sm-2.control-label(for="seed") Secret Seed
+    .col-sm-10
+      %textarea.form-control(placeholder="paste key seed here" rows="3" name="seed")
+        = params[:seed].try(:strip)
+
+  .form-group
+    .col-sm-offset-2.col-sm-10
+      %button.btn.btn-primary(type="submit") Submit

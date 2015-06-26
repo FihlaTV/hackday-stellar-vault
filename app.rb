@@ -41,10 +41,18 @@ class App < Sinatra::Base
   end
 
   get "/client" do
+    haml :index, layout: :application
+  end
+
+  get "/client/keys/new" do
+    haml :new_key, layout: :application
+  end
+
+  get "/client/transactions/new" do
     haml :new, layout: :application
   end
 
-  get "/client/:hash" do
+  get "/client/transactions/:hash" do
     tx = Transaction.where(hash_hex:params[:hash]).first
     raise "couldn't find tx" if tx.blank?
 
@@ -63,7 +71,6 @@ class App < Sinatra::Base
 
 
   # API Routes
-
   post '/transactions' do
     hex = params['hex']
     raw = Stellar::Convert.from_hex(hex)
@@ -74,7 +81,7 @@ class App < Sinatra::Base
       tx_hex: hex,
     })
 
-    redirect "/client/#{txm.hash_hex}"
+    redirect "/client/transactions/#{txm.hash_hex}"
   end
 
   patch '/transactions/:hash' do
@@ -92,13 +99,13 @@ class App < Sinatra::Base
 
       if result.present?
         # we errored
-        redirect "/client/#{txm.hash_hex}?result=#{result}"
+        redirect "/client/transactions/#{txm.hash_hex}?result=#{result}"
       end
 
       txm.wait_for_consensus
     end
 
-    redirect "/client/#{txm.hash_hex}"
+    redirect "/client/transactions/#{txm.hash_hex}"
   end
 
   post '/transactions/:hash/submit' do
@@ -109,12 +116,25 @@ class App < Sinatra::Base
 
     if result.present?
       # we errored
-      redirect "/client/#{txm.hash_hex}?result=#{result}"
+      redirect "/client/transactions/#{txm.hash_hex}?result=#{result}"
     end
 
     txm.wait_for_consensus
 
-    redirect "/client/#{txm.hash_hex}"
+    redirect "/client/transactions/#{txm.hash_hex}"
+  end
+
+  post '/keys' do
+    @key = Key.new(seed: params[:seed])
+    # @key.validator = TODO
+
+    if @key.save
+      flash[:success] = "Key added!"
+      redirect "/client"
+    else
+      flash.now[:danger] = @key.errors.full_messages.join("<br>\n")
+      haml :new_key, layout: :application
+    end
   end
 
 
