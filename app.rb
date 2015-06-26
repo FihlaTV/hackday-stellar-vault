@@ -16,6 +16,7 @@ require 'better_errors'
 require 'stellar-base'
 require 'memoist'
 require 'awesome_print'
+require 'rack-flash'
 
 AwesomePrint.defaults = {plain: true}
 
@@ -23,12 +24,16 @@ require_relative "./db"
 require_relative "./core"
 
 class App < Sinatra::Base
+  configure do
+    set :method_override, true
+    enable :sessions
+    use Rack::Flash
+  end
+
   configure :development do
     use BetterErrors::Middleware
     BetterErrors.application_root = __dir__
   end
-
-  configure{ set :method_override, true }
 
   # UI Routes
   get "/" do

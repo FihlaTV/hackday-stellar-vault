@@ -19,4 +19,7 @@
     .container-fluid
       %br
       %br
+      - [:success, :warning, :danger, :info].each do |level|
+        - if flash[level].present?
+          .alert(class="alert-#{level}" role="#{level}")= flash[level]
       = yield
